@@ -6,7 +6,7 @@
     "dev:all": "concurrently\" bun run dev:webhook\" \"bun run dev\" ",
     "dev:webhook": "ngrok http --url=herring-touched-seagull.ngrok-free.app 3000",
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build",  
     "start": "next start",
     "lint": "next lint"
   },

@@ -1,10 +1,13 @@
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
+// src/app/page.tsx
+import { trpc } from '@/trpc/server';
 
-export default function Home() {
+export default async function Home() {
+  // Call the `hello` procedure on the server
+  const  data  = await trpc.hello({ text: 'hllo' });
+
   return (
- <div>
-     <p>i will load videos in the future</p>
+    <div>
+      <p>Server component says {data.greeting}</p>
     </div>
   );
 }
