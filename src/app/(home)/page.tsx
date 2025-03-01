@@ -3,7 +3,7 @@ import { trpc } from '@/trpc/server';
 
 export default async function Home() {
   // Call the `hello` procedure on the server
-  const  data  = await trpc.hello({ text: 'hllo' });
+  void trpc.hello.prefetch({ text: 'hllo' });
 
   return (
     <div>
