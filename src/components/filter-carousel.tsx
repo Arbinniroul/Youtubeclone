@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "./ui/badge";
 import { Carousel, CarouselApi, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "./ui/carousel";
 import { useEffect, useState } from "react";
+import { Skeleton } from "./ui/skeleton";
 
 interface FilterCarouselProps{
     value?:string|null;
@@ -47,14 +48,23 @@ return(
             dragFree: true,
         }} className="w-full px-12">
                <CarouselContent className="-ml-3">
-               <CarouselItem className="pl-3 basis-auto">
-                <Badge variant={value===null?'default':'secondary' }
+               {!isloading && (
+               <CarouselItem className="pl-3 basis-auto" onClick={()=>onSelect?.(null)}>
+                <Badge 
                 className="rounded-lg px-3 py-1 cursor-pointer whitespace-nowrap text-sm">
                     All
                 </Badge>
-               </CarouselItem>
-               {!isloading && data.map((item)=>(
-                <CarouselItem key={item.value} className="pl-3 basis-auto">
+               </CarouselItem>)
+}
+               {isloading && Array.from({length:20}).map((_,index)=>(
+                <CarouselItem key={index} className="pl-3 basis-auto">
+                <Skeleton className="rounded-lg px-3 py-1 h-full text-sm w-[100px] font-semibold">
+                   &nbsp;
+                </Skeleton>
+                </CarouselItem>
+               ))}
+               { !isloading && data.map((item)=>(
+                <CarouselItem key={item.value} className="pl-3 basis-auto" onClick={()=>onSelect(item.value)}>
                     <Badge variant={value===null?'default':'secondary'} className="rounded-lg px-3 py-1 cursor-pointer whitespace-nowrap text-sm">
                     
                         {item.label}

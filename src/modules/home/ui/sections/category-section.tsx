@@ -29,7 +29,7 @@ const CategoriesSectionSuspense = ({ categoryId }: CategoriesSectionProps) => {
   label:category.name
   }))
   return (
-   <FilterCarousel value={categoryId} data={data}/>
+   <FilterCarousel onSelect={(x)=>console.log(x)} value={categoryId} data={data}/>
   );
 
 };
