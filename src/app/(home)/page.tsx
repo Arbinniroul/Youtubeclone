@@ -6,7 +6,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 
 export default async function Home() {
   // Call the `hello` procedure on the server
-  void trpc.hello.prefetch({ text: 'Arbin' });
+  void trpc.categories.getMany.prefetch();
 
   return (
    <HydrateClient>

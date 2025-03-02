@@ -4,12 +4,12 @@ import { trpc } from '@/trpc/client';
 import React from 'react';
 
 const PageClient = () => {
-  const [data] = trpc.hello.useSuspenseQuery({
-    text: 'Arbin2',
-  });
+  const [data] = trpc.categories.getMany.useSuspenseQuery()
 
   return (
-    <div>PageClient says: {data.greeting}</div>
+    <div>{
+      JSON.stringify(data)
+    }</div>
   );
 };
 
