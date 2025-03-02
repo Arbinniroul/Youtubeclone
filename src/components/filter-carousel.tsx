@@ -84,8 +84,8 @@ export const FilterCarousel = ({ value, onSelect, data, isloading }: FilterCarou
                     ))}
                 </CarouselContent>
 
-                <CarouselPrevious className="left-0 z-20" />
-                <CarouselNext className="right-0 z-20" />
+                <CarouselPrevious className="left-0 " />
+                <CarouselNext className="right-0" />
             </Carousel>
 
             {/* Right fade */}
