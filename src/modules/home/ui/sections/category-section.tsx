@@ -43,7 +43,7 @@ const CategoriesSectionSuspense = ({ categoryId }: CategoriesSectionProps) => {
 
   return (
     <FilterCarousel
-      isloading={false} 
+
       value={categoryId ||null}
       data={data}
       onSelect={onSelect} 
