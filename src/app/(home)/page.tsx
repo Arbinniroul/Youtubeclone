@@ -1,23 +1,24 @@
 // src/app/page.tsx
 import { HydrateClient, trpc } from '@/trpc/server';
-import PageClient from './client';
-import { Suspense } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
+import { Homeview } from '@/modules/home/ui/views/home-view';
+ 
 
-export default async function Home() {
+interface pageProps{
+  searchParams:Promise<{
+    categoryId?:string;
+  }>
+
+}
+ const Page=async({searchParams}:pageProps)=> {
+  const {categoryId}=await searchParams;
+
   // Call the `hello` procedure on the server
   void trpc.categories.getMany.prefetch();
 
   return (
    <HydrateClient>
-
-    <Suspense fallback={<p>...Loading</p>}>
-    <ErrorBoundary fallback={<p>Error</p>}>
-      <PageClient />  
-
-    </ErrorBoundary>
- 
-    </Suspense>
+     <Homeview categoryId={categoryId}/>
    </HydrateClient>
   );
 }
+export default Page;
