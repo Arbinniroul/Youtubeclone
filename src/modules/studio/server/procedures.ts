@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { videos } from "@/db/schema";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
+
 import { eq, and, or, lt, desc } from "drizzle-orm";
 import { z } from "zod";
 
@@ -53,11 +54,11 @@ export const studioRouter = createTRPCRouter({
           ? { id: lastItem.id, updatedAt: lastItem.updatedAt }
           : null;
 
-        // Retu[rn the expected structure for useInfiniteQuery
         return {
           items,
           nextCursor,
-        }
+
+        };
       } catch (error) {
         // Handle errors
         console.error("Error fetching videos:", error);

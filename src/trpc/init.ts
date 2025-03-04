@@ -10,20 +10,20 @@ import { ratelimit } from '@/lib/ratelimit';
 // Create the TRPC context
 export const createTRPCContext = cache(async () => {
   const { userId } = await auth();
-  if (!userId) return { clerkUserId: null, user: null }; // Return null if no user is found
+  if (!userId) return { clerkUserId: null, user: null }; 
 
-  // Fetch the user from the database using clerkUserId
+
   const [user] = await db
     .select()
     .from(users)
     .where(eq(users.clerkId, userId))
     .limit(1);
 
-  // Return clerkUserId and user object in context
+
   return { clerkUserId: userId, user };
 });
 
-// Type for the context
+
 export type Context = Awaited<ReturnType<typeof createTRPCContext>>;
 
 // Initialize tRPC with the context
@@ -48,13 +48,13 @@ export const protectedProcedure = baseProcedure.use(async (opts) => {
     throw new TRPCError({ code: 'UNAUTHORIZED', message: 'You must be logged in to access this resource' });
   }
 
-  // Check if user exists in the database
+
   const { user } = ctx;
   if (!user) {
     throw new TRPCError({ code: 'UNAUTHORIZED', message: 'You do not have access to this resource' });
   }
 
-  // Check rate limit
+
   const { success } = await ratelimit.limit(user.id);
   if (!success) {
     throw new TRPCError({ code: 'TOO_MANY_REQUESTS', message: 'Too many requests, please try again later' });
