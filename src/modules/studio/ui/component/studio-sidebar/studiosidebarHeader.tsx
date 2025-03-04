@@ -8,7 +8,7 @@ const StudioSidebarHeader=()=>{
     const {user}=useUser();
     const { state}=useSidebar();
     if(!user) {return (
-        <SidebarHeader className='flex items-center justify-center pb-4'>
+        <SidebarHeader className='flex items-center justify-center pb-4 '>
           <Skeleton className="size-[112px] rounded-full"/>
           <div className="flex flex-col items-center mt-2 gap-y-2">
           <Skeleton className="h-4 w-[60px]"></Skeleton>
@@ -20,7 +20,7 @@ const StudioSidebarHeader=()=>{
 if(state==='collapsed' )
 {
     return(
-        <SidebarMenuItem className="flex items-center h-10 justify-center mb-4">
+        <SidebarMenuItem className="flex items-center h-10 justify-center mb-4 pr-3">
             
             <SidebarMenuButton tooltip='Your Profile' asChild>
              <Link href='/users/current'>

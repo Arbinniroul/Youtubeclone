@@ -1,10 +1,18 @@
 import { CategoriesRouter } from '@/modules/categories/server/procedures';
-import {  createTRPCRouter } from '../init';
+import { createTRPCRouter } from '../init';
+import { studioRouter } from '@/modules/studio/server/procedures';
+import { VideosRouter } from '@/modules/videos/server/procedures';
 
 
 export const appRouter = createTRPCRouter({
-  categories:CategoriesRouter,
+  
+
+  studio: studioRouter,
+  categories: CategoriesRouter,
+  videos: VideosRouter,
+
+  
 });
 
-// Export the AppRouter type
+
 export type AppRouter = typeof appRouter;

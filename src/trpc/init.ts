@@ -5,53 +5,66 @@ import { auth } from '@clerk/nextjs/server';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-
 import { ratelimit } from '@/lib/ratelimit';
+
+// Create the TRPC context
 export const createTRPCContext = cache(async () => {
   const { userId } = await auth();
-  return { clerkUserId: userId };
+  if (!userId) return { clerkUserId: null, user: null }; // Return null if no user is found
+
+  // Fetch the user from the database using clerkUserId
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.clerkId, userId))
+    .limit(1);
+
+  // Return clerkUserId and user object in context
+  return { clerkUserId: userId, user };
 });
 
+// Type for the context
 export type Context = Awaited<ReturnType<typeof createTRPCContext>>;
 
-
+// Initialize tRPC with the context
 const t = initTRPC.context<Context>().create({
   transformer: superjson,
 });
 
-
+// Create routers and caller factory
 export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;
 export const baseProcedure = t.procedure;
 
-
-
+// Protected procedure that ensures authentication and limits rate of requests
 export const protectedProcedure = baseProcedure.use(async (opts) => {
   const { ctx } = opts;
 
+  // Debugging log to check if context is set
+  console.log("TRPC Context:", ctx);
 
-  if (!ctx.clerkUserId) {
+  // If user is not authenticated, throw an error
+  if (!ctx || !ctx.user) {
     throw new TRPCError({ code: 'UNAUTHORIZED', message: 'You must be logged in to access this resource' });
   }
 
-  const [user]=await db
-   .select()
-   .from(users)
-   .where(eq(users.clerkId, ctx.clerkUserId))
-   .limit(1);;
-
-   if(!user){
+  // Check if user exists in the database
+  const { user } = ctx;
+  if (!user) {
     throw new TRPCError({ code: 'UNAUTHORIZED', message: 'You do not have access to this resource' });
-   }
-   const {success}=await ratelimit.limit(user.id);
-   if(!success){
+  }
+
+  // Check rate limit
+  const { success } = await ratelimit.limit(user.id);
+  if (!success) {
     throw new TRPCError({ code: 'TOO_MANY_REQUESTS', message: 'Too many requests, please try again later' });
-   }
-  // Pass the context to the next middleware or procedure
+  }
+
+  // Pass the user object to the next handler
   return opts.next({
     ctx: {
       ...ctx,
-      user,
+      user, // Attach the user to the context for the next procedures
     },
   });
 });
