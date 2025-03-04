@@ -1,8 +1,10 @@
 "use client"
+import { ResponsiveModel } from "@/components/responsive-dialog";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/trpc/client";
 import { Loader2Icon, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { StudioUploader } from "./studio-uploader";
 
 export const StudioUploadModel = () => {
 
@@ -22,6 +24,15 @@ export const StudioUploadModel = () => {
     
 
   return (
+    <>
+
+    <ResponsiveModel title="upload a video" 
+    open={!!create.data?.url} onOpenChange={()=>{create.reset()}}>
+     { create.data?.url ? <StudioUploader endPoint={create.data.url} onSucess={()=>{}}/>
+      :<Loader2Icon/>}
+    <p>This will be an uploader</p>
+
+    </ResponsiveModel>
     <Button
   variant="secondary"
   onClick={() => {
@@ -37,6 +48,7 @@ export const StudioUploadModel = () => {
   {create.isPending ? <Loader2Icon className="animate-spin" /> : <Plus />}
   Create
 </Button>
+    </>
 
   
   );
