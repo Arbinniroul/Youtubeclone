@@ -1,8 +1,9 @@
 "use client";
-
+import { format } from 'date-fns';
 import { PageInfinteScroll } from '@/components/inifinite-scroll';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DEFAULT_LIMIT } from '@/constants';
+import { snakeCaseToTitle } from '@/lib/utils';
 import { VideoThumbnail } from '@/modules/videos/ui/components/videoThumbnail';
 import { trpc } from '@/trpc/client';
 import Link from 'next/link';
@@ -51,11 +52,16 @@ const VideoSectionSupense = () => {
                                         <div className='relative aspect-video w-36 shrink-0'>
                                             <VideoThumbnail imageUrl={video.thumbnailUrl} previewUrl={video.previewUrl} title={video.title} duration={video.duration ||0}/>
                                         </div>
+                                        <div className='flex flex-col overflow-hidden gap-y-1 '>
+                                            <span className='text-sm line-clamp-1'>{video.title}</span>
+                                            <span className='text-xs text-muted-foreground'>{video.description || "No description"}</span>
+                                        </div>
+                                        
                                     </div></TableCell>
 
                                     <TableCell>Visibility</TableCell>
-                                    <TableCell>status</TableCell>
-                                    <TableCell>Date</TableCell>
+                                    <TableCell><div className='flex items-center '>{snakeCaseToTitle(video.muxStatus || "error")}</div></TableCell>
+                                    <TableCell className='text-sm truncate  '>{format(new Date(video.createdAt), "d MMM yyyy")}</TableCell>
                                     <TableCell className='text-right'>Views</TableCell>
                                     <TableCell className='text-right'>Component</TableCell>
                                     <TableCell className='text-right pr-6'>Likes</TableCell>
@@ -66,7 +72,7 @@ const VideoSectionSupense = () => {
             </div>
 
             <PageInfinteScroll
-                isManual={false}
+                isManual
                 hasNextPage={query.hasNextPage}
                 isFetchingNextPage={query.isFetchingNextPage}
                 fetchNextpage={query.fetchNextPage}
