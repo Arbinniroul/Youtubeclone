@@ -38,7 +38,7 @@ console.log("create",create)
         ) : (
           <Loader2Icon className="animate-spin" />
         )}
-        <p>This will be an uploader</p>
+
       </ResponsiveModel>
       <Button
         variant="secondary"
