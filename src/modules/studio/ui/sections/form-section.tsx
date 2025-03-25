@@ -5,9 +5,9 @@ import { videoUpdateSchema } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { P, Z } from "@upstash/redis/zmscore-Dc6Llqgr";
-import { MoreVerticalIcon, TrashIcon } from "lucide-react";
+import { CopyCheckIcon, CopyIcon, Globe2Icon, LockIcon, MoreVerticalIcon, TrashIcon } from "lucide-react";
 import {zodResolver} from "@hookform/resolvers/zod"
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { Dropdown } from "react-day-picker";
 import { ErrorBoundary } from "react-error-boundary";
 import { useForm } from "react-hook-form";
@@ -18,9 +18,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger } from "@/components/ui/select";
 import { SelectContent, SelectItem, SelectValue } from "@radix-ui/react-select";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn, snakeCaseToTitle } from "@/lib/utils";
 import { VideoThumbnail } from "@/modules/videos/ui/components/videoThumbnail";
 import { VideoPlayer } from "@/modules/videos/ui/components/videoPlayer";
+import Link from "next/link";
 
 
 interface FormSectionProps{
@@ -69,6 +70,23 @@ const FormSectionSkeleton=   ()=>{
          update.mutate(data);
 
     }
+//   TODO: if outside locahost
+    const fullUrl=`${process.env.VERCEL_URL || "http://localhost:3000"}/videos/${video.id}`
+    const [isCopied,setIsCopied]=useState(false);
+    const onCopy=()=>{
+        navigator.clipboard.writeText(fullUrl).then(()=>{
+            toast.success("URL copied to clipboard");
+            setIsCopied(true);
+            setTimeout(()=>{
+                setIsCopied(false);
+            },2000);
+        }).catch(()=>{
+            toast.error("Failed to copy URL");
+        });
+
+    }
+
+
     return(
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -191,8 +209,112 @@ const FormSectionSkeleton=   ()=>{
                     <VideoPlayer playbackId={video.muxPlaybackId} thumbnailUrl={video.thumbnailUrl}/>
 
                 </div>
+                <div className="p-4 flex flex-col gap-y-6">
+                    <div className="flex justify-between items-center gap-x-2">
+                        <div className="flex flex-col gap-y-1">
+                            <p className="text-muted-foreground text-sm ">
+                                VideoLink
+                            </p>
+                            <div className="flex items-center gap-x-2">
+                                <Link href={`videos/${video.id}`}>
+                                <p>
+                                    <a className="text-blue-500 hover:text-blue-600 line-clamp-1 text-sm" href={`/videos/${video.id}`}>
+                                        <span>{ fullUrl }</span>
+                                    </a>
+                                </p>
+
+                                </Link>
+                                <Button type="button" variant="ghost" size="icon" className="shrink-0" onClick={onCopy} disabled={false}>
+                                  {isCopied ? <CopyCheckIcon/>:<CopyIcon/>  }  
+                                </Button>
+
+                            </div>
+
+                        </div>
+                   
+                    </div>
+                    <div className="flex justify-between items-center ">
+                        <div className="flex flex-col gap-y-1">
+                            <p className="text-muted-foreground text-xs">
+                                Video Status
+                            </p>
+                            <p className="text-sm">
+                                {snakeCaseToTitle(video.muxStatus || "preparing")}
+                            </p>
+                        </div>
+
+                    </div>
+                    <div className="flex justify-between items-center ">
+                        <div className="flex flex-col gap-y-1">
+                            <p className="text-muted-foreground text-xs">
+                                Video Status
+                            </p>
+                            <p className="text-sm">
+                                {snakeCaseToTitle(video.muxTrackStatus || "no_audio")}
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
 
             </div>
+            <FormField
+  control={form.control}
+  name="visibiltity"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Visibility</FormLabel>
+      <FormControl>
+        <div className="relative">
+          <select
+            {...field}
+
+            className={cn(
+              "flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm",
+              "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+              "appearance-none",
+              "disabled:cursor-not-allowed disabled:opacity-50"
+            )}
+            style={{
+              backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m6 9 6 6 6-6'/%3e%3c/svg%3e")`,
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "right 1rem center",
+              backgroundSize: "1em",
+            }}
+            defaultValue="private" 
+          >
+            <option value="" disabled className="text-muted-foreground">
+              Select Visibility
+            </option>
+            <option
+              value="public"
+              className="px-4 py-2 hover:bg-accent focus:bg-accent"
+            >
+              Public
+            </option>
+            <option
+              value="private"
+              className="px-4 py-2 hover:bg-accent focus:bg-accent"
+            >
+              Private
+            </option>
+          </select>
+          
+
+          <div className="absolute right-10 top-3 flex gap-2">
+            {field.value === "public" ? (
+              <Globe2Icon className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <LockIcon className="h-4 w-4 text-muted-foreground" />
+            )}
+          </div>
+        </div>
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+
                 </div>
             </div>
         </form>
