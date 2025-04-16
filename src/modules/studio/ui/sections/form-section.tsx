@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import { P, Z } from "@upstash/redis/zmscore-Dc6Llqgr";
-import { CopyCheckIcon, CopyIcon, Globe2Icon, LockIcon, MoreVerticalIcon, TrashIcon } from "lucide-react";
+import { CopyCheckIcon, CopyIcon, Globe2Icon, ImagePlayIcon, ImagePlusIcon, LockIcon, MoreVerticalIcon, RotateCcwIcon, SparklesIcon, TrashIcon } from "lucide-react";
 import {zodResolver} from "@hookform/resolvers/zod"
 import { Suspense, useState } from "react";
 import { Dropdown } from "react-day-picker";
@@ -32,6 +32,8 @@ import { VideoPlayer } from "@/modules/videos/ui/components/videoPlayer";
 import Link from "next/link";
 import Image from "next/image";
 import { THUMBNAIL_FALLBACK } from "@/modules/videos/constant";
+import { ThumbnailUploadModal } from "../component/thumbnail-upload-modal";
+import { set } from "date-fns";
 
 
 interface FormSectionProps{
@@ -56,6 +58,7 @@ const FormSectionSkeleton=   ()=>{
  const FormSectionSuspense=({videoId}:FormSectionProps)=>{
     const router=useRouter();
     const utlis=trpc.useUtils();
+    const [thumbnailModalOpen,setThumbnailModalOpen]=useState(false);
     const [video]=trpc.studio.getOne.useSuspenseQuery({id:videoId})
     const [categories]=trpc.categories.getMany.useSuspenseQuery()
 
@@ -72,6 +75,17 @@ const FormSectionSkeleton=   ()=>{
 
         },
     })
+    const restoreThumbnail=trpc.videos.restoreThumbnail.useMutation({
+      onError: () => {
+          toast.error("Something went wrong");
+
+      },
+      onSuccess: () => {
+       utlis.studio.getMany.invalidate()
+       utlis.studio.getOne.invalidate({id:videoId})
+       toast.success("Thumbnail Restored");
+      },
+  })
     const remove=trpc.videos.remove.useMutation({
       onError: () => {
           toast.error("Something went wrong");
@@ -113,6 +127,8 @@ const FormSectionSkeleton=   ()=>{
 
 
     return(
+      <>
+      <ThumbnailUploadModal open={thumbnailModalOpen} onOpenChange={setThumbnailModalOpen} videoId={videoId}/>
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
 
@@ -207,7 +223,20 @@ const FormSectionSkeleton=   ()=>{
                 <MoreVerticalIcon className="size-4 text-white" />
               </Button>
             </DropdownMenuTrigger>
-            {/* Add DropdownMenuContent here if needed */}
+            <DropdownMenuContent align="start" side="right">
+            <DropdownMenuItem onClick={()=>setThumbnailModalOpen(true)}>
+              <ImagePlusIcon className="size-4 mr-1"/>
+              Change
+            </DropdownMenuItem>
+             <DropdownMenuItem >
+              <SparklesIcon className="size-4 mr-1"/>
+              AI-Generated
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={()=>restoreThumbnail.mutate({id:videoId})}>
+              <RotateCcwIcon className="size-4 mr-1"/>
+              Restore
+            </DropdownMenuItem>
+            </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </FormControl>
@@ -375,7 +404,7 @@ const FormSectionSkeleton=   ()=>{
             </div>
         </form>
         </Form>
-    
+        </>
     )
-
+  
 }
