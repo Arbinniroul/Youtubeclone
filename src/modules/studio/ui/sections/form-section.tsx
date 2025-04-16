@@ -301,7 +301,7 @@ const FormSectionSkeleton=   ()=>{
                                 VideoLink
                             </p>
                             <div className="flex items-center gap-x-2">
-                                <Link href={`videos/${video.id}`}>
+                                <Link href={`/videos/${video.id}`}>
                                 <p>
                                     <a className="text-blue-500 hover:text-blue-600 line-clamp-1 text-sm" href={`/videos/${video.id}`}>
                                         <span>{ fullUrl }</span>

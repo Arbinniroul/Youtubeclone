@@ -116,7 +116,7 @@ const VideoSectionSupense = () => {
                     </TableHeader>
                     <TableBody>
                         {videos.pages.flatMap((page) => page.items).map((video) => (
-                            <Link href={`/studio/videos/${video.id}`} key={video.id} legacyBehavior>
+                            <Link href={`studio/videos/${video.id}/`} key={video.id} legacyBehavior>
                                 <TableRow>
                                     <TableCell className='pl-6 w-[510px]'><div className='flex items-center gap-4'>
                                         <div className='relative aspect-video w-36 shrink-0'>
