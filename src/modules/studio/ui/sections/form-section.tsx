@@ -1,9 +1,17 @@
 "use client"
-
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { videoUpdateSchema } from "@/db/schema";
 import { trpc } from "@/trpc/client";
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
 import { P, Z } from "@upstash/redis/zmscore-Dc6Llqgr";
 import { CopyCheckIcon, CopyIcon, Globe2Icon, LockIcon, MoreVerticalIcon, TrashIcon } from "lucide-react";
 import {zodResolver} from "@hookform/resolvers/zod"
@@ -22,6 +30,8 @@ import { cn, snakeCaseToTitle } from "@/lib/utils";
 import { VideoThumbnail } from "@/modules/videos/ui/components/videoThumbnail";
 import { VideoPlayer } from "@/modules/videos/ui/components/videoPlayer";
 import Link from "next/link";
+import Image from "next/image";
+import { THUMBNAIL_FALLBACK } from "@/modules/videos/constant";
 
 
 interface FormSectionProps{
@@ -44,9 +54,11 @@ const FormSectionSkeleton=   ()=>{
     )
 }
  const FormSectionSuspense=({videoId}:FormSectionProps)=>{
+    const router=useRouter();
     const utlis=trpc.useUtils();
     const [video]=trpc.studio.getOne.useSuspenseQuery({id:videoId})
     const [categories]=trpc.categories.getMany.useSuspenseQuery()
+
     const update=trpc.videos.update.useMutation({
         onError: () => {
             toast.error("Something went wrong");
@@ -60,6 +72,19 @@ const FormSectionSkeleton=   ()=>{
 
         },
     })
+    const remove=trpc.videos.remove.useMutation({
+      onError: () => {
+          toast.error("Something went wrong");
+
+      },
+      onSuccess: () => {
+       utlis.studio.getMany.invalidate();
+       router.push('/studio');
+       toast.success("Video removed");
+
+
+      },
+  })
     
     const form=useForm<z.infer<typeof videoUpdateSchema>>({
         resolver:zodResolver(videoUpdateSchema),
@@ -107,10 +132,12 @@ const FormSectionSkeleton=   ()=>{
                     </Button>
 
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="flex shadow-lg rounded-md p-2 px-4 hover:bg-gray-200">
+                <DropdownMenuContent onClick={()=>remove.mutate({id:videoId})} align="end" className="flex shadow-lg rounded-md p-2 px-4 hover:bg-gray-200">
 
-                    <TrashIcon className="size-4 mr-2 mt-1 "/>
-                Delete
+                  <TrashIcon className="size-4 mr-2 mt-1 "/>
+                  Delete
+
+                    
                 </DropdownMenuContent>
 
             
@@ -158,8 +185,37 @@ const FormSectionSkeleton=   ()=>{
 
                     </FormItem>
     )}
-                />
-                {/* TODO:Add thumbnail field here */}
+  />
+
+<FormField
+  name="thumbnailUrl" 
+  control={form.control} 
+  render={() => (
+    <FormItem>
+      <FormLabel>Thumbnail</FormLabel>
+      <FormControl>
+        <div className="relative p-0.5 border border-dashed border-neutral-400 h-[84px] w-[153px] group">
+          <Image
+            fill
+            alt="Thumbnail"
+            src={video.thumbnailUrl ?? THUMBNAIL_FALLBACK}
+            className="object-cover"
+          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="button" size='icon' className="bg-black/50 hover:bg-black/50 absolute top-1 right-1 rounded-full opacity-100 md:opacity-0 group-hover:opacity-100 duration-300 size-7">
+                <MoreVerticalIcon className="size-4 text-white" />
+              </Button>
+            </DropdownMenuTrigger>
+            {/* Add DropdownMenuContent here if needed */}
+          </DropdownMenu>
+        </div>
+      </FormControl>
+    </FormItem>
+  )} 
+/>
+
+
                 <FormField
   control={form.control}
   name="category"
