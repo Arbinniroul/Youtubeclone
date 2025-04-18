@@ -1,12 +1,31 @@
+import { useMemo } from "react";
 import { VideoGetOneOutput } from "../../types";
+import { Videodescription } from "./VideoDescription";
 import { VideoMenu } from "./VideoMenu";
 import { VideoOwner } from "./VideoOwner";
 import { VideoReaction } from "./VideoReactions";
+import { format, formatDistanceToNow } from "date-fns";
 
 interface videoTopRowProps{
     video:VideoGetOneOutput;
 }
 export const VideoTopRow=({video}:videoTopRowProps)=>{
+      const compactViews=useMemo(()=>{
+            return Intl.NumberFormat("en",{
+                notation:"compact"
+            }).format(8840333332)
+        },[])
+        const expandedViews=useMemo(()=>{
+            return Intl.NumberFormat("en",{
+                notation:"standard"
+            }).format(88240333332)
+        },[])
+        const compactDate=useMemo(()=>{
+            return formatDistanceToNow(video.createdAt,{addSuffix:true})
+        },[video.createdAt])
+        const expandedDate=useMemo(()=>{
+            return format(video.createdAt,"d MMM yyyy")
+        },[video.createdAt])
     return (
 <div className="flex flex-col gap-4 mt-4 ">
     <h1 className="text-xl font-semibold">{video.title}</h1>
@@ -17,7 +36,12 @@ export const VideoTopRow=({video}:videoTopRowProps)=>{
       <VideoMenu videoId={video.id} variant="secondary"/>
     </div>
     </div>
-<Videodescription description={video.description}/>
+<Videodescription
+ compactView={compactViews}
+ expandedViews={expandedViews}
+ compactDate={compactDate}
+ expandedDate={expandedDate}
+ description={video.description}/>
 </div>
     )
 }
