@@ -9,6 +9,9 @@ import { ErrorBoundary } from "react-error-boundary"
 import { VideoPlayer } from "../components/videoPlayer";
 import VideoBanner from "../components/VideoBanner";
 import { VideoTopRow } from "../components/VideoTopRow";
+import { useAuth } from "@clerk/nextjs";
+
+
 
 interface videoSectionProps{
   videoId:string;
@@ -23,13 +26,25 @@ const VideoSection = ({videoId}:videoSectionProps) => {
   )
 }
 const VideoSectionSuspense=({videoId}:videoSectionProps)=> {
+  const {isSignedIn}=useAuth()
   const[ video]=trpc.videos.getOne.useSuspenseQuery({id:videoId})
+  const utils=trpc.useUtils();
+  const createView=trpc.videoViews.create.useMutation({
+    onSuccess:()=>{
+      utils.videos.getOne.invalidate({id:videoId})
+    }
+  });
+  const handlePlay=()=>{
+    if(!isSignedIn) return
+    createView.mutate({videoId})
+  }
+
   return (
  <>
 <div className={cn("aspect-video bg-black rounded-xl overflow-hidden  relative ",video.muxStatus !=="ready" && "rounded-b-none")}>
 <VideoPlayer
 autoPlay
-onPlay={()=>{}}
+onPlay={handlePlay}
 playbackId={video.muxPlaybackId}
 thumbnailUrl={video.thumbnailUrl}
 />
