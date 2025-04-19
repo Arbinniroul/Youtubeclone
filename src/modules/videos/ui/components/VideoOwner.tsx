@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { VideoGetOneOutput } from "../../types";
 import { UserAvatar } from "@/components/user-avatar";
-import { useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { SubscriptionButton } from "@/modules/subscription/ui/components/SubscriptionButton";
 import { UserInfo } from "@/modules/users/ui/components/UserInfo";
+import { UserSubscriptions } from "@/modules/subscription/hooks/user-subscription";
+import { useAuth } from "@clerk/nextjs";
+import { users } from "@/db/schema";
 
 interface videoOwnerProps{
     user:VideoGetOneOutput["user"]
@@ -12,7 +14,14 @@ interface videoOwnerProps{
 }
 
 export const VideoOwner=({user,videoId}:videoOwnerProps)=>{
-    const {userId:clerkUserId}=useAuth()
+
+    const {userId:clerkUserId,isLoaded}=useAuth()
+    const {isPending,onClick}=UserSubscriptions({
+      userId:user.id,
+      isSubscribed:user.viewerSubscribed,
+      fromVideoId:videoId
+
+    })
     return(
         <div className="flex items-center sm:items-start justify-between sm:justify-start gap-3 min-w-0">
                 <Link href={`/user/${user.id}`}>
@@ -21,7 +30,7 @@ export const VideoOwner=({user,videoId}:videoOwnerProps)=>{
                     <UserInfo size="lg" name={user.name}/>
                     <span className="text-sm text-muted-foreground line-clamp-1">
                         {/* TODO:properly fill subscriber count */}
-                        {0} Subscribers
+                        {user.subscriberCount} subscribers
                     </span>
 
                    </div>
@@ -36,7 +45,7 @@ export const VideoOwner=({user,videoId}:videoOwnerProps)=>{
               )
               :(
                 <SubscriptionButton 
-                onClick={()=>{}} disabled={false} isSubscribed={false} className="flex-none"/>
+                onClick={onClick} disabled={isPending || !isLoaded} isSubscribed={user.viewerSubscribed} className="flex-none"/>
 
 
               )
