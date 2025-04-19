@@ -6,6 +6,8 @@ import { videoViewsRouter } from '@/modules/videoViews/server/procedures';
 import { videoReactionRouter } from '@/modules/videoReactions/server/procedures';
 import { subscribtionsRouter } from '@/modules/subscription/server/procedures';
 import { commentsRouter } from '@/modules/comments/server/procedures';
+import { commentReactionRouter } from '@/modules/commentReactions/server/procedures';
+
 
 
 
@@ -20,6 +22,7 @@ export const appRouter = createTRPCRouter({
   videoReactions:videoReactionRouter,
   subscriptions:subscribtionsRouter,
   comments:commentsRouter,
+  commentReactions:commentReactionRouter
 
 
   

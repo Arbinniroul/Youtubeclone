@@ -2,12 +2,57 @@ import Link from "next/link";
 import { CommentGetManyOutput } from "../../types";
 import { UserAvatar } from "@/components/user-avatar";
 import { formatDistanceToNow } from "date-fns";
+import { trpc } from "@/trpc/client";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger,DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { MessageSquareIcon, MoreVerticalIcon, ThumbsDownIcon, ThumbsUpIcon, Trash2Icon } from "lucide-react";
+import { useAuth, useClerk } from "@clerk/nextjs";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+
 
 interface commentItemProps{
-    comment:CommentGetManyOutput[number];
+    comment:CommentGetManyOutput["items"][number];
 }
 
 export const CommentItem=({comment}:commentItemProps)=>{
+    const utils=trpc.useUtils();
+    const clerk=useClerk();
+const remove=trpc.comments.remove.useMutation({
+    onSuccess:()=>{
+        toast.success("Comment Deleted")
+        utils.comments.getMany.invalidate({videoId:comment.videoId});
+    },
+    onError:(error)=>{
+        toast.error("Error ")
+    if(error.data?.code==="UNAUTHORIZED"){
+        clerk.openSignIn();
+    }
+    }
+});
+const {userId}=useAuth();
+const like=trpc.commentReactions.like.useMutation({
+    onSuccess:()=>{
+        utils.comments.getMany.invalidate({videoId:comment.videoId})
+    },
+    onError:(error)=>{
+        toast.error("something went wrong")
+        if(error.data?.code==="UNAUTHORIZED"){
+            clerk.openSignIn();
+        }
+    }
+});
+const dislike=trpc.commentReactions.dislike.useMutation({
+    onSuccess:()=>{
+        utils.comments.getMany.invalidate({videoId:comment.videoId})
+    },
+    onError:(error)=>{
+        toast.error("something went wrong")
+        if(error.data?.code==="UNAUTHORIZED"){
+            clerk.openSignIn();
+        }
+    }
+});
 
     return (
         <div className="">
@@ -33,8 +78,49 @@ export const CommentItem=({comment}:commentItemProps)=>{
 
                         </Link>
                         <p className="text-sm">{comment.value}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <div className="flex items-center">
+                                        <Button className="size-8"
+                                        variant="ghost" disabled={like.isPending}
+                                        onClick={()=>like.mutate({commentId:comment.id})}
+                                        >
+                                            <ThumbsUpIcon className={cn(comment.viewerReactions==="like"&&"fill-black")}/>
+                                        </Button>
+                                        <span className="text-xs text-muted-foreground">{comment.likeCount}</span>
+                                        <Button className="size-8"
+                                        variant="ghost" disabled={dislike.isPending}
+                                        onClick={()=>dislike.mutate({commentId:comment.id})}
+                                        
+                                        >
+                                            <ThumbsDownIcon className={cn(comment.viewerReactions==="dislike"&&"fill-black")}/>
+                                        </Button>
+                                        <span className="text-xs text-muted-foreground">{comment.dislikeCount}</span>
+
+
+                                    </div>
+
+                                </div>
 
                     </div>
+                    <DropdownMenu modal={false}>
+                        <DropdownMenuTrigger>
+                            <Button variant="ghost" size="icon" className="size-8">
+                                <MoreVerticalIcon/>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end"  >
+                            <DropdownMenuItem onClick={()=>{}} className="flex">
+                                <MessageSquareIcon className="size-4"/>
+                                Reply
+                            </DropdownMenuItem>
+                            {comment.user.clerkId === userId &&(
+                            <DropdownMenuItem onClick={()=>remove.mutate({id:comment.id})
+                            } className="flex">
+                                <Trash2Icon className="size-4"/>
+                                Delete
+                            </DropdownMenuItem>)}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
                 </div>
         </div>
