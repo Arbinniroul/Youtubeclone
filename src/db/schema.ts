@@ -1,6 +1,7 @@
 import { pgTable, text, uuid, timestamp, uniqueIndex, integer, pgEnum,primaryKey} from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
+import { foreignKey } from "drizzle-orm/mysql-core";
 export const reactionType=pgEnum("reaction_type",["like","dislike"]);
 
 
@@ -125,11 +126,22 @@ export const categoryRelations = relations(categories, ({ many }) => ({
 export const comments=pgTable("comments",{
     id:uuid("id").primaryKey().defaultRandom(),
     userId:uuid("user_id").references(()=>users.id,{onDelete:"cascade"}).notNull(),
+    parentId:uuid("parent_id"),
     videoId:uuid("video_id").references(()=>videos.id,{onDelete:"cascade"}).notNull(),
     value:text("value").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 
+},(t)=>{
+    return[
+        foreignKey({
+            columns:[t.parentId],
+            foreignColumns:[t.id],
+            name:"comments_parent_id_fkey)",
+
+        })
+        .onDelete("cascade")
+    ]
 })
 
 export const commentRelations=relations(comments,({one,many})=>({
@@ -143,6 +155,16 @@ export const commentRelations=relations(comments,({one,many})=>({
         references:[videos.id],
 
     }),
+    parent:one(comments,{
+        fields:[comments.parentId],
+        references:[comments.id],
+        relationName:"comments_parent_id_fkey",
+
+    }),
+    replies:many(comments,{
+        relationName:"comments_parent_id_fkey",
+    }),
+
     reactions:many(commentReactions)
 }))
 export const commentSelectSchmea=createSelectSchema(comments);

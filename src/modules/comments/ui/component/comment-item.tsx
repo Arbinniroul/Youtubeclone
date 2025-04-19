@@ -1,21 +1,26 @@
 import Link from "next/link";
 import { CommentGetManyOutput } from "../../types";
 import { UserAvatar } from "@/components/user-avatar";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, set } from "date-fns";
 import { trpc } from "@/trpc/client";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger,DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MessageSquareIcon, MoreVerticalIcon, ThumbsDownIcon, ThumbsUpIcon, Trash2Icon } from "lucide-react";
+import { ChevronDown, ChevronUp, MessageSquareIcon, MoreVerticalIcon, ThumbsDownIcon, ThumbsUpIcon, Trash2Icon } from "lucide-react";
 import { useAuth, useClerk } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { CommentForm } from "./comment-form";
+import { current } from "@reduxjs/toolkit";
+import { CommentReplies } from "./comment-replies";
 
 
 interface commentItemProps{
     comment:CommentGetManyOutput["items"][number];
+    variant:"reply"|"comment"
 }
 
-export const CommentItem=({comment}:commentItemProps)=>{
+export const CommentItem=({comment,variant="comment"}:commentItemProps)=>{
     const utils=trpc.useUtils();
     const clerk=useClerk();
 const remove=trpc.comments.remove.useMutation({
@@ -31,6 +36,8 @@ const remove=trpc.comments.remove.useMutation({
     }
 });
 const {userId}=useAuth();
+const [isReplyOpen,setIsReplyOpen]=useState(false);
+const [isRepliesOpen,setIsRepliesOpen]=useState(false);
 const like=trpc.commentReactions.like.useMutation({
     onSuccess:()=>{
         utils.comments.getMany.invalidate({videoId:comment.videoId})
@@ -58,7 +65,7 @@ const dislike=trpc.commentReactions.dislike.useMutation({
         <div className="">
                 <div className="flex gap-4">
                     <Link href={`/users/${comment.userId}`}>
-                    <UserAvatar size="lg" imageUrl={comment.user.imageUrl} name={comment.user.name}/>
+                    <UserAvatar size={variant==="comment"?"lg":"sm"} imageUrl={comment.user.imageUrl} name={comment.user.name}/>
                     </Link>
                     <div className="flex-1 min-w-0">
                         <Link href={`/users/${comment.userId}`}>
@@ -98,10 +105,15 @@ const dislike=trpc.commentReactions.dislike.useMutation({
 
 
                                     </div>
+                                    {variant ==="comment"&& (<Button className="h-8" variant="ghost" size="sm" onClick={()=>{setIsReplyOpen(true)}}>
+                                        Reply
+                                    </Button>)}
 
                                 </div>
 
                     </div>
+                    {
+                        comment.user.clerkId ===userId && variant==="reply" && (
                     <DropdownMenu modal={false}>
                         <DropdownMenuTrigger>
                             <Button variant="ghost" size="icon" className="size-8">
@@ -109,7 +121,7 @@ const dislike=trpc.commentReactions.dislike.useMutation({
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end"  >
-                            <DropdownMenuItem onClick={()=>{}} className="flex">
+                            <DropdownMenuItem onClick={()=>{{setIsReplyOpen(true)}}} className="flex">
                                 <MessageSquareIcon className="size-4"/>
                                 Reply
                             </DropdownMenuItem>
@@ -121,8 +133,40 @@ const dislike=trpc.commentReactions.dislike.useMutation({
                             </DropdownMenuItem>)}
                         </DropdownMenuContent>
                     </DropdownMenu>
-
+)
+}
                 </div>
+       {isReplyOpen && variant==="comment" &&(
+        <div className="mt-14 pl-14">
+            <CommentForm
+            variant="reply"
+            parentId={comment.id}
+            onCancel={()=>setIsReplyOpen(false)}
+            videoId={comment.videoId}
+            onSuccess={()=>{
+                setIsReplyOpen(false);
+                setIsRepliesOpen(true);
+            }}
+            />
+
+        </div>
+       )}
+       {comment.replyCount>0 && variant==="comment" &&(
+        <div className="pl-4">
+            <Button variant="tertiary" size="sm" onClick={()=>setIsRepliesOpen((current)=>!current)}>
+                {
+                    isRepliesOpen?<ChevronUp/>:<ChevronDown/>
+                }
+                {
+                    comment.replyCount
+                } replies
+
+            </Button>
+        </div>
+       )}
+       {comment.replyCount>0 && variant==="comment" && isRepliesOpen &&(
+        <CommentReplies parentId={comment.id} videoId={comment.videoId} />
+       )}
         </div>
     )
 
