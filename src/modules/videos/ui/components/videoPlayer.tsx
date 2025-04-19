@@ -9,7 +9,13 @@ interface videoPlayerProps{
     autoplay?:string |null | undefined;
     onPlay?:()=>void;
 }
+export const VideoPlayerSkeleton=()=>{
+    return(
+        <div className="aspect-video bg-black rounded-xl "/>
 
+     
+    )
+}
 export const VideoPlayer=({playbackId,thumbnailUrl, autoplay, onPlay}:videoPlayerProps)=>{
     if(!playbackId){
         return null;

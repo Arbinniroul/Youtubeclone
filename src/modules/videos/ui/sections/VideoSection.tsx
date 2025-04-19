@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils";
 import { trpc } from "@/trpc/client";
 import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
-import { VideoPlayer } from "../components/videoPlayer";
+import { VideoPlayer, VideoPlayerSkeleton } from "../components/videoPlayer";
 import VideoBanner from "../components/VideoBanner";
-import { VideoTopRow } from "../components/VideoTopRow";
+import { VideoTopRow, VideoTopRowSkeleton } from "../components/VideoTopRow";
 import { useAuth } from "@clerk/nextjs";
 
 
@@ -18,11 +18,19 @@ interface videoSectionProps{
 }
 const VideoSection = ({videoId}:videoSectionProps) => {
   return (
-    <Suspense fallback={<p>Loading</p>}>
+    <Suspense fallback={<VideoSectionSkeleton/>}>
       <ErrorBoundary fallback={<p>Error</p>}>
         <VideoSectionSuspense videoId={videoId}/>
       </ErrorBoundary>
     </Suspense>
+  )
+}
+const VideoSectionSkeleton=()=>{
+  return(
+    <>
+    <VideoPlayerSkeleton/>
+    <VideoTopRowSkeleton/>
+    </>
   )
 }
 const VideoSectionSuspense=({videoId}:videoSectionProps)=> {
