@@ -23,8 +23,8 @@ import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectTrigger } from "@/components/ui/select";
-import { SelectContent, SelectItem, SelectValue } from "@radix-ui/react-select";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+
 import { toast } from "sonner";
 import { cn, snakeCaseToTitle } from "@/lib/utils";
 import { VideoThumbnail } from "@/modules/videos/ui/components/videoThumbnail";
@@ -34,6 +34,7 @@ import Image from "next/image";
 import { THUMBNAIL_FALLBACK } from "@/modules/videos/constant";
 import { ThumbnailUploadModal } from "../component/thumbnail-upload-modal";
 import { set } from "date-fns";
+import { APP_URL } from "@/constants";
 
 
 interface FormSectionProps{
@@ -99,7 +100,20 @@ const FormSectionSkeleton=   ()=>{
 
       },
   })
-    
+  const revalidate=trpc.videos.revalidate.useMutation({
+    onError: () => {
+        toast.error("Something went wrong");
+
+    },
+    onSuccess: () => {
+     utlis.studio.getMany.invalidate();
+     utlis.studio.getOne.invalidate({id:videoId});
+     router.push('/studio');
+     toast.success("Video revalidated");
+
+
+    },
+})
     const form=useForm<z.infer<typeof videoUpdateSchema>>({
         resolver:zodResolver(videoUpdateSchema),
         defaultValues:video,
@@ -110,7 +124,7 @@ const FormSectionSkeleton=   ()=>{
 
     }
 //   TODO: if outside locahost
-    const fullUrl=`${process.env.VERCEL_URL || "http://localhost:3000"}/videos/${video.id}`
+    const fullUrl=`${APP_URL || "http://localhost:3000"}/videos/${video.id}`
     const [isCopied,setIsCopied]=useState(false);
     const onCopy=()=>{
         navigator.clipboard.writeText(fullUrl).then(()=>{
@@ -148,14 +162,23 @@ const FormSectionSkeleton=   ()=>{
                     </Button>
 
                 </DropdownMenuTrigger>
-                <DropdownMenuContent onClick={()=>remove.mutate({id:videoId})} align="end" className="flex shadow-lg rounded-md p-2 px-4 hover:bg-gray-200">
+                <DropdownMenuContent align="end" className="flex flex-col shadow-lg rounded-md  hover:bg-gray-200 ">
 
-                  <TrashIcon className="size-4 mr-2 mt-1 "/>
-                  Delete
+                <DropdownMenuItem onClick={()=>remove.mutate({id:videoId})} >
+                <TrashIcon className="size-4 mr-2 mt-1 "/>
+                Delete
+
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={()=>revalidate.mutate({id:videoId})} >
+                <RotateCcwIcon className="size-4 mr-2 mt-1 "/>
+                Revalidate
+
+                </DropdownMenuItem>
+
 
                     
                 </DropdownMenuContent>
-
+               
             
             </DropdownMenu>
             </div>
@@ -245,43 +268,25 @@ const FormSectionSkeleton=   ()=>{
 />
 
 
-                <FormField
+<FormField
   control={form.control}
   name="category"
   render={({ field }) => (
     <FormItem>
       <FormLabel>Category</FormLabel>
       <FormControl>
-        <div className="relative">
-          <select
-            {...field}
-            className={cn (
-              "flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background",
-              "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-              "appearance-none", // Remove default arrow
-              "disabled:cursor-not-allowed disabled:opacity-50"
-            )}
-            style={{
-              backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m6 9 6 6 6-6'/%3e%3c/svg%3e")`,
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "right 1rem center",
-              backgroundSize: "1em",
-            }}
-          >
-            <option value="" disabled className="text-muted-foreground">
-              Select a Category
-            </option>
+        <Select onValueChange={field.onChange} value={field.value}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select a Category" />
+          </SelectTrigger>
+          <SelectContent>
             {categories.map((category) => (
-              <option
-                key={category.id}
-                value={category.id}
-                className="px-4 py-2 hover:bg-accent focus:bg-accent"
-              >
+              <SelectItem key={category.id} value={category.id}>
                 {category.name}
-              </option>
+              </SelectItem>
             ))}
-          </select>
-        </div>
+          </SelectContent>
+        </Select>
       </FormControl>
       <FormMessage />
     </FormItem>
@@ -302,11 +307,11 @@ const FormSectionSkeleton=   ()=>{
                             </p>
                             <div className="flex items-center gap-x-2">
                                 <Link href={`/videos/${video.id}`}>
-                                <p>
-                                    <a className="text-blue-500 hover:text-blue-600 line-clamp-1 text-sm" href={`/videos/${video.id}`}>
+
+                                    <p className="text-blue-500 hover:text-blue-600 line-clamp-1 text-sm">
                                         <span>{ fullUrl }</span>
-                                    </a>
-                                </p>
+                                    </p>
+
 
                                 </Link>
                                 <Button type="button" variant="ghost" size="icon" className="shrink-0" onClick={onCopy} disabled={false}>
@@ -345,61 +350,25 @@ const FormSectionSkeleton=   ()=>{
             </div>
             <FormField
   control={form.control}
-  name="visibiltity"
+  name="visibility" // Fixed typo in field name (was "visibiltity")
   render={({ field }) => (
     <FormItem>
       <FormLabel>Visibility</FormLabel>
       <FormControl>
-        <div className="relative">
-          <select
-            {...field}
-
-            className={cn(
-              "flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm",
-              "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-              "appearance-none",
-              "disabled:cursor-not-allowed disabled:opacity-50"
-            )}
-            style={{
-              backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m6 9 6 6 6-6'/%3e%3c/svg%3e")`,
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "right 1rem center",
-              backgroundSize: "1em",
-            }}
-            defaultValue="private" 
-          >
-            <option value="" disabled className="text-muted-foreground">
-              Select Visibility
-            </option>
-            <option
-              value="public"
-              className="px-4 py-2 hover:bg-accent focus:bg-accent"
-            >
-              Public
-            </option>
-            <option
-              value="private"
-              className="px-4 py-2 hover:bg-accent focus:bg-accent"
-            >
-              Private
-            </option>
-          </select>
-          
-
-          <div className="absolute right-10 top-3 flex gap-2">
-            {field.value === "public" ? (
-              <Globe2Icon className="h-4 w-4 text-muted-foreground" />
-            ) : (
-              <LockIcon className="h-4 w-4 text-muted-foreground" />
-            )}
-          </div>
-        </div>
+        <Select onValueChange={field.onChange} value={field.value}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select Visibility" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="public">Public</SelectItem>
+            <SelectItem value="private">Private</SelectItem>
+          </SelectContent>
+        </Select>
       </FormControl>
       <FormMessage />
     </FormItem>
   )}
 />
-
                 </div>
             </div>
         </form>

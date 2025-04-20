@@ -7,7 +7,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { UserInfo } from "@/modules/users/ui/components/UserInfo";
 import { UserAvatar } from "@/components/user-avatar";
 import { VideoMenu } from "./VideoMenu";
-import { VideoThumbnail } from "./videoThumbnail";
+import { VideoThumbnail, VideoThumbnailSkeleton } from "./videoThumbnail";
 import { VideoGetManyOutput } from "../../types";
 import { cn } from "@/lib/utils";
 
@@ -44,14 +44,45 @@ interface videoRowCardProps extends VariantProps<typeof videoRowCardVariants>{
 
 }
 
-export const videoRowCardSkeleton=()=>{
+export const VideoRowCardSkeleton=({size="default"}:VariantProps<typeof videoRowCardVariants>)=>{
     return(
-        <div>
-            <Skeleton/>
+        <div className={videoRowCardVariants({size})}>
+                <div className={thumbnailVariants({size})}>
+                    <VideoThumbnailSkeleton/>
+
+                </div>
+                <div className="flex-1 min-w-0">
+                    <div className="flex justify-between gap-x-2">
+                        <div className="flex-1 min-w-0">
+                            <Skeleton className={cn("h-5 w-[40%]",size==="compact" && "h-4 w-[40%]")}/>
+                            {
+                                size==="default" &&(
+                                    <>
+                                    <Skeleton className="h-4 w-[20%] mt-1"/>
+                                    <div className="flex item-center gap-2 space-y-3">
+                                    <Skeleton className="size-8 rounded-full"/>
+                                    <Skeleton className="h-4 w-24"/>
+
+
+                                    </div>
+                                    </>
+                                )
+                            }
+                            {
+                                size==="compact" &&(
+                                    <>
+                                    <Skeleton className="h-4 w-[50%] mt-1"/>
+                                    </>
+                                )
+                            }
+                        </div>
+                    </div>
+
+                </div>
         </div>
     )
 }
-export const VideoRowCard=({data,size,onRemove}:videoRowCardProps)=>{
+export const VideoRowCard=({data,size="default",onRemove}:videoRowCardProps)=>{
     const compactViews=useMemo(()=>{
     return Intl.NumberFormat("en",{
    notation:"compact"
@@ -75,7 +106,7 @@ export const VideoRowCard=({data,size,onRemove}:videoRowCardProps)=>{
 
 <div className="flex-1 min-w-0 ">
     <div className="flex justify-between gap-x-2">
-        <Link href={`videos/${data.id}`} className="flex-1 min-w-0">
+        <Link href={`/videos/${data.id}`} className="flex-1 min-w-0">
         <h3 className={cn("font-medium line-clamp-2 ",size==="compact"?"text-sm":"text-base")}>
             {data.title}
         </h3>
