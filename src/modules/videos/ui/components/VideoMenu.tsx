@@ -12,7 +12,7 @@ onRemove:()=>void;
 }
 
 export const VideoMenu=({videoId,
-    variant,
+    variant="ghost",
     onRemove}:videoMenuProps)=>{
         const onShare=()=>{
             

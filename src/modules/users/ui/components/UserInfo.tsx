@@ -6,7 +6,7 @@ const userInfoVariants=cva("flex items-center gap-1 ",{
         size:{
             default:"[_&p]:text-sm [&_svg]:size-4",
             lg:"[&_p]:text-base [&svg]:size-5 [&_p]:font-medium [&_p]:text-black ",
-            samll:"[_&p]:text-xs [&_svg]:size-3.5",
+            sm:"[&_p]:text-xs [&_svg]:size-3.5",
             
         }
     },

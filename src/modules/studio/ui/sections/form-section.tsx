@@ -332,7 +332,7 @@ const FormSectionSkeleton=   ()=>{
                     <div className="flex justify-between items-center ">
                         <div className="flex flex-col gap-y-1">
                             <p className="text-muted-foreground text-xs">
-                                Video Status
+                                Audio Status
                             </p>
                             <p className="text-sm">
                                 {snakeCaseToTitle(video.muxTrackStatus || "no_audio")}
