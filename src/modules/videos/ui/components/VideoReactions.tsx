@@ -3,7 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import {   ThumbsDownIcon, ThumbsUpIcon } from "lucide-react"
 import { VideoGetOneOutput } from "../../types";
-import { useAuth } from "@clerk/nextjs";
+
 import { trpc } from "@/trpc/client";
 import { toast } from "sonner";
 
@@ -17,14 +17,14 @@ interface VideoReactionProps{
 export const VideoReaction=({
     videoId,likes,dislikes,viewerReaction
 }:VideoReactionProps)=>{
-const clerk=useAuth();
+
 const utils=trpc.useUtils();
 const like=trpc.videoReactions.like.useMutation({
     onSuccess:()=>{
         utils.videos.getOne.invalidate({id:videoId})
         //TODO:Invalidate playlist
     },
-    onError:(error)=> {
+    onError:()=> {
         toast.error("Something Went Wrong")
      
     },
@@ -34,7 +34,7 @@ const dislike=trpc.videoReactions.dislike.useMutation({
         utils.videos.getOne.invalidate({id:videoId})
         //TODO:Invalidate playlist
     },
-    onError:(error)=> {
+    onError:()=> {
         toast.error("Something Went Wrong")
         
 }})

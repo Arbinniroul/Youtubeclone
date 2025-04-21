@@ -3,7 +3,7 @@ import { users, videos } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 
 import { and, eq } from "drizzle-orm";
-import { Upload } from "lucide-react";
+
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError,UTApi } from "uploadthing/server";
 import { z } from "zod";

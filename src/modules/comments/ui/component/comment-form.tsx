@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { UserAvatar } from "@/components/user-avatar";
-import { commentInsertSchema, users } from "@/db/schema";
+import { commentInsertSchema } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import { useClerk, useUser } from "@clerk/nextjs";
 

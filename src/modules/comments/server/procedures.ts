@@ -1,11 +1,11 @@
 import { db } from "@/db";
-import {  commentReactions, comments, users, videos } from "@/db/schema";
+import {  commentReactions, comments, users } from "@/db/schema";
 import { baseProcedure, createTRPCRouter,protectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
-import { NOTFOUND } from "dns";
+
 import { and, count, desc, eq, getTableColumns, inArray, isNotNull, isNull, lt, or } from "drizzle-orm";
-import { AudioWaveformIcon } from "lucide-react";
-import { comment } from "postcss";
+
+
 
 import { z } from "zod";
 

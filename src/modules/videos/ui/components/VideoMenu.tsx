@@ -39,7 +39,7 @@ export const VideoMenu=({videoId,
                     <ListPlusIcon className="mr-2 size-4"/>
                     Add to Playlist
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={()=>{}}>
+                    <DropdownMenuItem onClick={onRemove}>
                     <Trash2Icon className="mr-2 size-4"/>
                     Remove Item
                     </DropdownMenuItem>

@@ -1,7 +1,7 @@
 import { ResponsiveModel } from "@/components/responsive-dialog";
 import { UploadDropzone } from "@/lib/uploadthing";
 import { trpc } from "@/trpc/client";
-import { throwDeprecation } from "process";
+
  interface ThumbnailUploadModalProps{
     videoId:string,
     open:boolean,

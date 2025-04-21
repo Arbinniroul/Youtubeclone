@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { VideoGetOneOutput } from "../../types";
-import { UserAvatar } from "@/components/user-avatar";
+
 import { Button } from "@/components/ui/button";
 import { SubscriptionButton } from "@/modules/subscription/ui/components/SubscriptionButton";
 import { UserInfo } from "@/modules/users/ui/components/UserInfo";
 import { UserSubscriptions } from "@/modules/subscription/hooks/user-subscription";
 import { useAuth } from "@clerk/nextjs";
-import { users } from "@/db/schema";
+
 
 interface videoOwnerProps{
     user:VideoGetOneOutput["user"]

@@ -1,5 +1,5 @@
 
-import { useIsMobile } from "@/hooks/use-mobile";
+
 import { CategoriesSection } from "../sections/CategoriesSection";
 import { ResultSection } from "../sections/ResultSection";
 

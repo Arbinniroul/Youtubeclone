@@ -1,7 +1,7 @@
 "use client"
 
 
-import { videos } from "@/db/schema";
+
 import { cn } from "@/lib/utils";
 import { trpc } from "@/trpc/client";
 import { Suspense } from "react"

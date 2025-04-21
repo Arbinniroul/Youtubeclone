@@ -4,7 +4,7 @@ import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
 
 import { eq, and, or, lt, desc } from "drizzle-orm";
-import { CarTaxiFront } from "lucide-react";
+
 import { z } from "zod";
 
 export const studioRouter = createTRPCRouter({
