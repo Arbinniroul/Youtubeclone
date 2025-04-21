@@ -51,20 +51,20 @@ export const searchRouter = createTRPCRouter({
           .innerJoin(users, eq(videos.userId, users.id))
           .where(
             and(
-              ilike(videos.title, `%${query}%`), // Fixed: Added % at both ends for proper search
-              categoryId ? eq(videos.categoryId, categoryId) : undefined,
-              // Removed: eq(videos.userId, userId) - This was limiting to only user's videos
-              cursor
-                ? or(
-                    lt(videos.updatedAt, cursor?.updatedAt ?? new Date()),
-                    and(
-                      eq(videos.updatedAt, cursor.updatedAt),
-                      lt(videos.id, cursor.id),
-                    ),
-                  )
-                : undefined,
-            ),
+              ...[
+                eq(videos.visibility, "public"),
+                ilike(videos.title, `%${query}%`),
+                categoryId ? eq(videos.categoryId, categoryId) : undefined,
+                cursor
+                  ? or(
+                      lt(videos.updatedAt, cursor.updatedAt),
+                      and(eq(videos.updatedAt, cursor.updatedAt), lt(videos.id, cursor.id))
+                    )
+                  : undefined,
+              ].filter(Boolean)
+            )
           )
+          
           .orderBy(desc(videos.updatedAt), desc(videos.id))
           .limit(limit + 1);
 

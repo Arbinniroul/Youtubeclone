@@ -16,7 +16,7 @@ interface FilterCarouselProps {
     }[];
 }
 
-export const FilterCarousel = ({ value, onSelect, data, isloading }: FilterCarouselProps) => {
+export const FilterCarousel = ({ value, onSelect, data, isLoading }: FilterCarouselProps) => {
     const [api, setApi] = useState<CarouselApi>();
     const [current, setCurrent] = useState(0);
     const [count, setCount] = useState(0);
@@ -51,7 +51,7 @@ export const FilterCarousel = ({ value, onSelect, data, isloading }: FilterCarou
             >
                 <CarouselContent className="-ml-3">
                     {/* "All" filter option */}
-                    {!isloading && (
+                    {!isLoading && (
                         <CarouselItem className="pl-3 basis-auto" onClick={() => onSelect?.(null)} >
                             <Badge
                                 variant={value === null ? 'default' : 'secondary'} // Highlight "All" when selected
@@ -63,7 +63,7 @@ export const FilterCarousel = ({ value, onSelect, data, isloading }: FilterCarou
                     )}
 
                     {/* Skeleton placeholders */}
-                    {isloading && Array.from({ length: 20 }).map((_, index) => (
+                    {isLoading && Array.from({ length: 20 }).map((_, index) => (
                         <CarouselItem key={index} className="pl-3 basis-auto">
                             <Skeleton className="rounded-lg px-3 py-1 h-full text-sm w-[100px] font-semibold">
                                 &nbsp;
@@ -72,7 +72,7 @@ export const FilterCarousel = ({ value, onSelect, data, isloading }: FilterCarou
                     ))}
 
                     {/* Category filter options */}
-                    {!isloading && data.map((item) => (
+                    {!isLoading && data.map((item) => (
                         <CarouselItem key={item.value} className="pl-3 basis-auto" onClick={() => onSelect?.(item.value)}>
                             <Badge
                                 variant={value === item.value ? 'default' : 'secondary'} // Highlight selected category
