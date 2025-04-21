@@ -21,7 +21,7 @@ const items = [
   {
     title: "Trending",
     url: "/feed/trending",
-    icon: FlameIcon, // Use the imported icon component
+    icon: FlameIcon, 
   },
 ];
 

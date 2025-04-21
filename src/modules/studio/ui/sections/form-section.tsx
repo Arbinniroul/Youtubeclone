@@ -7,16 +7,15 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
+
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { P, Z } from "@upstash/redis/zmscore-Dc6Llqgr";
-import { CopyCheckIcon, CopyIcon, Globe2Icon, ImagePlayIcon, ImagePlusIcon, LockIcon, MoreVerticalIcon, RotateCcwIcon, SparklesIcon, TrashIcon } from "lucide-react";
+
+import { CopyCheckIcon, CopyIcon, ImagePlusIcon, MoreVerticalIcon, RotateCcwIcon, SparklesIcon, TrashIcon } from "lucide-react";
 import {zodResolver} from "@hookform/resolvers/zod"
 import { Suspense, useState } from "react";
-import { Dropdown } from "react-day-picker";
+
 import { ErrorBoundary } from "react-error-boundary";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -26,14 +25,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 
 import { toast } from "sonner";
-import { cn, snakeCaseToTitle } from "@/lib/utils";
-import { VideoThumbnail } from "@/modules/videos/ui/components/videoThumbnail";
+import {  snakeCaseToTitle } from "@/lib/utils";
+
 import { VideoPlayer } from "@/modules/videos/ui/components/videoPlayer";
 import Link from "next/link";
 import Image from "next/image";
 import { THUMBNAIL_FALLBACK } from "@/modules/videos/constant";
 import { ThumbnailUploadModal } from "../component/thumbnail-upload-modal";
-import { set } from "date-fns";
+
 import { APP_URL } from "@/constants";
 
 

@@ -1,10 +1,10 @@
 import { db } from "@/db";
 import { users, videoReactions, videos, videoViews } from "@/db/schema";
-import { baseProcedure, createTRPCRouter, protectedProcedure } from "@/trpc/init";
+import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
 
 import { eq, and, or, lt, desc, ilike, getTableColumns } from "drizzle-orm";
-import { CarTaxiFront } from "lucide-react";
+
 import { z } from "zod";
 
 export const searchRouter = createTRPCRouter({
@@ -22,9 +22,9 @@ export const searchRouter = createTRPCRouter({
         limit: z.number().int().min(1).max(100),
       }),
     )
-    .query(async ({ ctx, input }) => {
+    .query(async ({  input }) => {
       const { categoryId, query, cursor, limit } = input;
-      const { id: userId } = ctx.user;
+
 
       try {
         const data = await db

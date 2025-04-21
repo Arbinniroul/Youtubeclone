@@ -12,7 +12,7 @@ interface CategoriesSectionProps {
 
 export const CategoriesSection = ({ categoryId }: CategoriesSectionProps) => {
   return (
-    <Suspense fallback={<FilterCarousel isloading data={[]} onSelect={() => {}} />}>
+    <Suspense fallback={<FilterCarousel isLoading data={[]} onSelect={() => {}} />}>
       <ErrorBoundary fallback={<p>Something went wrong. Please try again.</p>}>
         <CategoriesSectionSuspense categoryId={categoryId} />
       </ErrorBoundary>
