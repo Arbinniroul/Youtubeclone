@@ -37,7 +37,7 @@ export const videos = pgTable("videos", {
     previewUrl:text("preview_url"),
     previewKey:text("preview_key"),
     duration:integer("duration").default(0).notNull(),
-    visibiltity:videoVisibility("visibility").default("private").notNull(),
+    visibility: videoVisibility("visibility").default("private").notNull(),
     userId: uuid("user_id").references(() => users.id, { 
         onDelete: "cascade",
         

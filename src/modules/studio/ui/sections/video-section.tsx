@@ -129,7 +129,7 @@ const VideoSectionSupense = () => {
                                         
                                     </div></TableCell>
 
-                                    <TableCell><div className='flex'>{video.visibiltity=="private"?( <Lock className='size-4'/> ):<Unlock className='size-4'/>} {snakeCaseToTitle(video.visibiltity)}</div></TableCell>
+                                    <TableCell><div className='flex'>{video.visibility=="private"?( <Lock className='size-4'/> ):<Unlock className='size-4'/>} {snakeCaseToTitle(video.visibility)}</div></TableCell>
                                     <TableCell><div className='flex items-center '>{snakeCaseToTitle(video.muxStatus || "error")}</div></TableCell>
                                     <TableCell className='text-sm truncate  '>{format(new Date(video.createdAt), "d MMM yyyy")}</TableCell>
                                     <TableCell className='text-right text-sm'>Views</TableCell>

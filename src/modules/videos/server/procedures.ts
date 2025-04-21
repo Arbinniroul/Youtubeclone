@@ -210,7 +210,7 @@ const {key:thumbnailKey,url:thumbnailUrl}=uploadedThumbnail.data;
       title: input.title,
       description: input.description,
       categoryId: input.categoryId,
-      visibiltity:input.visibiltity,
+      visibility:input.visibility,
       updatedAt:new Date()
               
     })

@@ -1,6 +1,6 @@
 import { HomeLayout } from "@/modules/home/ui/layouts/homeLayout"
 
-
+export const dynamic="force-dynamic"
 interface layoutProps{
     children:React.ReactNode
 }

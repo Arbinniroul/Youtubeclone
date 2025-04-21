@@ -8,13 +8,11 @@ import { CarTaxiFront } from "lucide-react";
 import { z } from "zod";
 
 export const searchRouter = createTRPCRouter({
- 
-  
   getMany: baseProcedure
     .input(
       z.object({
-        query:z.string(),
-        categoryId:z.string().uuid().nullish(),
+        query: z.string(),
+        categoryId: z.string().uuid().nullish(),
         cursor: z
           .object({
             id: z.string().uuid(),
@@ -25,58 +23,55 @@ export const searchRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const {categoryId,query, cursor, limit } = input;
+      const { categoryId, query, cursor, limit } = input;
       const { id: userId } = ctx.user;
 
       try {
-        
         const data = await db
           .select({
             ...getTableColumns(videos),
-            user:users,
-             viewCount: db.$count(videoViews, eq(videoViews.videoId, videos.id)),
-                        likeCount: db.$count(
-                          videoReactions,
-                          and(
-                            eq(videoReactions.videoId, videos.id),
-                            eq(videoReactions.type, "like")
-                          )
-                        ),
-                        dislikeCount: db.$count(
-                          videoReactions,
-                          and(
-                            eq(videoReactions.videoId, videos.id),
-                            eq(videoReactions.type, "dislike")
-                          )
-                        )
-
+            user: users,
+            viewCount: db.$count(videoViews, eq(videoViews.videoId, videos.id)),
+            likeCount: db.$count(
+              videoReactions,
+              and(
+                eq(videoReactions.videoId, videos.id),
+                eq(videoReactions.type, "like")
+              )
+            ),
+            dislikeCount: db.$count(
+              videoReactions,
+              and(
+                eq(videoReactions.videoId, videos.id),
+                eq(videoReactions.type, "dislike")
+              )
+            )
           })
           .from(videos)
-          .innerJoin(users,eq(videos.userId,users.id))
+          .innerJoin(users, eq(videos.userId, users.id))
           .where(
             and(
-                ilike(videos.title,`%${query}`)
-                ,categoryId?eq(videos.categoryId,categoryId):undefined,
-              eq(videos.userId, userId), 
+              ilike(videos.title, `%${query}%`), // Fixed: Added % at both ends for proper search
+              categoryId ? eq(videos.categoryId, categoryId) : undefined,
+              // Removed: eq(videos.userId, userId) - This was limiting to only user's videos
               cursor
                 ? or(
-                    lt(videos.updatedAt, cursor?.updatedAt ?? new Date()), 
+                    lt(videos.updatedAt, cursor?.updatedAt ?? new Date()),
                     and(
                       eq(videos.updatedAt, cursor.updatedAt),
                       lt(videos.id, cursor.id),
                     ),
                   )
-                : undefined, 
+                : undefined,
             ),
           )
-          .orderBy(desc(videos.updatedAt), desc(videos.id)) 
-          .limit(limit + 1); 
+          .orderBy(desc(videos.updatedAt), desc(videos.id))
+          .limit(limit + 1);
 
         const hasMore = data.length > limit;
-        const items = hasMore ? data.slice(0, -1) : data; 
+        const items = hasMore ? data.slice(0, -1) : data;
         const lastItem = items[items.length - 1];
 
-   
         const nextCursor = hasMore
           ? { id: lastItem.id, updatedAt: lastItem.updatedAt }
           : null;
@@ -84,12 +79,13 @@ export const searchRouter = createTRPCRouter({
         return {
           items,
           nextCursor,
-
         };
       } catch (error) {
-
         console.error("Error fetching videos:", error);
-        throw new Error("Failed to fetch videos");
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch videos",
+        });
       }
     }),
 });

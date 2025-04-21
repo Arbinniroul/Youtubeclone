@@ -117,14 +117,16 @@ const FormSectionSkeleton=   ()=>{
     const form=useForm<z.infer<typeof videoUpdateSchema>>({
         resolver:zodResolver(videoUpdateSchema),
         defaultValues:video,
+        categoryId: video.categoryId || "",
+    visibility: video.visibility || "private"
 
     })
     const onSubmit= (data:z.infer<typeof videoUpdateSchema>)=>{
          update.mutate(data);
 
     }
-//   TODO: if outside locahost
-    const fullUrl=`${APP_URL || "http://localhost:3000"}/videos/${video.id}`
+
+    const fullUrl=`${APP_URL}/videos/${video.id}`
     const [isCopied,setIsCopied]=useState(false);
     const onCopy=()=>{
         navigator.clipboard.writeText(fullUrl).then(()=>{
@@ -270,7 +272,7 @@ const FormSectionSkeleton=   ()=>{
 
 <FormField
   control={form.control}
-  name="category"
+  name="categoryId"  // Changed from "category" to "categoryId"
   render={({ field }) => (
     <FormItem>
       <FormLabel>Category</FormLabel>
