@@ -15,7 +15,7 @@ export const HomeNavbar = () => {
           <Link href="/">
             <div className="p-4 flex items-center gap-1">
               <Image src="/logo.svg" alt="logo" width={32} height={32} />
-              <p className="text-xl font-semibold tracking-tight">Youtube</p>
+              <p className="text-xl font-semibold tracking-tight">GhewTube</p>
             </div>
           </Link>
         </div>
