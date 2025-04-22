@@ -20,7 +20,7 @@ export const SubscriptionButton=({onClick,disabled,isSubscribed,className,size}:
         onClick={onClick}
         disabled={disabled}
         >
-            {isSubscribed ? "Unsubscribe" : "Subscribe"}
+            {isSubscribed  ? "Unsubscribe" : "Subscribe"}
         </Button>
     )
 

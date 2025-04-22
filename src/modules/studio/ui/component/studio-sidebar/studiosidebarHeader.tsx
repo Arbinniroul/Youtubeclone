@@ -27,7 +27,7 @@ if(state==='collapsed' )
              <UserAvatar
              imageUrl={user?.imageUrl}
              name={user?.fullName??"User"}
-             classname="sm"
+             size="sm"
 
              />
              <span className="text-sm">Your Profile</span>
@@ -38,7 +38,7 @@ if(state==='collapsed' )
 }
     return(
         <SidebarHeader className='flex items-center justify-center pb-4'>
-            <Link href='/user/current'>
+          <Link href='/user/current'>
             <UserAvatar
             imageUrl={user?.imageUrl}
             name={user?.fullName ??"User"}
@@ -46,6 +46,7 @@ if(state==='collapsed' )
             />
             </Link>
             <div className="flex flex-col items-center mt-2">
+            
                 <p className="text-sm font-medium">
                     Your Profile
                 </p>

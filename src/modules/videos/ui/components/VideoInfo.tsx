@@ -2,10 +2,11 @@ import { useMemo } from "react";
 import { VideoGetManyOutput } from "../../types";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
-import { UserAvatar } from "@/components/user-avatar";
+
 import { UserInfo } from "@/modules/users/ui/components/UserInfo";
 import { VideoMenu } from "./VideoMenu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { UserAvatar } from "@/components/user-avatar";
 
 interface videoInfoProps{
     data:VideoGetManyOutput["items"][number],
@@ -36,7 +37,7 @@ export const VideoInfo=({data,onRemove}:videoInfoProps)=>{
             return(
                 <div className="flex gap-3">
                     <Link href={`/users/${data.userId}`}>
-                        <UserAvatar imageUrl={data.user.imageUrl} name={data.user.name}/>
+                    <UserAvatar size="sm"  imageUrl={data.user.imageUrl} name={data.user.name}/>
                     </Link>
 
                     <div className="min-w-0 flex-1">

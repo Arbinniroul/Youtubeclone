@@ -6,6 +6,7 @@ import { SubscriptionButton } from "@/modules/subscription/ui/components/Subscri
 import { UserInfo } from "@/modules/users/ui/components/UserInfo";
 import { UserSubscriptions } from "@/modules/subscription/hooks/user-subscription";
 import { useAuth } from "@clerk/nextjs";
+import { UserAvatar } from "@/components/user-avatar";
 
 
 interface videoOwnerProps{
@@ -26,11 +27,12 @@ export const VideoOwner=({user,videoId}:videoOwnerProps)=>{
         <div className="flex items-center sm:items-start justify-between sm:justify-start gap-3 min-w-0">
                 <Link href={`/user/${user.id}`}>
                 <div className="flex items-center gap-3 min-w-0">
+                  <UserAvatar size="md" imageUrl={user.imageUrl} name={user.name} />
                    <div className="flex flex-col gap-1 min-w-0">
                     <UserInfo size="lg" name={user.name}/>
                     <span className="text-sm text-muted-foreground line-clamp-1">
                         {/* TODO:properly fill subscriber count */}
-                        {user.subscriberCount} subscribers
+                        {user.subscriberCount} {user.subscriberCount>1?"subscribers":"subscriber"}
                     </span>
 
                    </div>

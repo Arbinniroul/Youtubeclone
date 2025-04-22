@@ -65,7 +65,7 @@ const dislike=trpc.commentReactions.dislike.useMutation({
         <div className="">
                 <div className="flex gap-4">
                     <Link href={`/users/${comment.userId}`}>
-                    <UserAvatar size={variant==="comment"?"lg":"sm"} imageUrl={comment.user.imageUrl} name={comment.user.name}/>
+                    <UserAvatar  size={variant==="comment"?"lg":"sm"} imageUrl={comment.user.imageUrl} name={comment.user.name}/>
                     </Link>
                     <div className="flex-1 min-w-0">
                         <Link href={`/users/${comment.userId}`}>

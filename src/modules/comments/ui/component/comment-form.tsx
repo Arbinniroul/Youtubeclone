@@ -63,6 +63,7 @@ export const CommentForm=({videoId,onSuccess,parentId,onCancel,variant="comment"
        <form className="flex gap-4 group"
        onSubmit={form.handleSubmit(handleSubmit)}>
         <UserAvatar
+        
         size="lg"
         imageUrl={user?.imageUrl || '/user-placeholder.svg'}
         name={user?.username|| "User"}
