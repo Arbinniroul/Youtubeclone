@@ -6,22 +6,23 @@ import { HistoryIcon, ListVideoIcon, ThumbsUpIcon } from "lucide-react"; // Impo
 import { SidebarGroupLabel } from "@/components/ui/sidebar";
 import { useClerk } from "@clerk/nextjs";
 import { useAuth } from "@clerk/clerk-react";
+import { usePathname } from "next/navigation";
 const items = [
   {
     title: "History",
-    url: "/playlist/history",
+    url: "/playlists/history",
     icon: HistoryIcon,
     auth: true, // Use the imported icon component
   },
   {
     title: "Liked Videos",
-    url: "/playlist/liked",
+    url: "/playlists/liked",
     icon: ThumbsUpIcon,
     auth: true, // Use the imported icon component
   },
   {
     title: "All Playlists",
-    url: "/playlist",
+    url: "/playlists",
     icon: ListVideoIcon, // Use the imported icon component
     auth: true,
   },
@@ -29,6 +30,7 @@ const items = [
 ];
 
 const PersonalSection = () => {
+  const pathName=usePathname();
   const {isSignedIn}=useAuth()
   const clerk=useClerk();
   return (
@@ -42,7 +44,7 @@ const PersonalSection = () => {
               <SidebarMenuButton
                 tooltip={item.title}
                 asChild
-                isActive={false} //TODO: change to look at current pathname
+                isActive={pathName===item.url} 
                 onClick={(e) => {
                   if(!isSignedIn && item.auth){
                    e.preventDefault();

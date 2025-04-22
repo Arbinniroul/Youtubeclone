@@ -22,7 +22,8 @@ const utils=trpc.useUtils();
 const like=trpc.videoReactions.like.useMutation({
     onSuccess:()=>{
         utils.videos.getOne.invalidate({id:videoId})
-        //TODO:Invalidate playlist
+        utils.playlists.getLiked.invalidate()
+        
     },
     onError:()=> {
         toast.error("Something Went Wrong")
@@ -32,7 +33,7 @@ const like=trpc.videoReactions.like.useMutation({
 const dislike=trpc.videoReactions.dislike.useMutation({
     onSuccess:()=>{
         utils.videos.getOne.invalidate({id:videoId})
-        //TODO:Invalidate playlist
+        utils.playlists.getLiked.invalidate()
     },
     onError:()=> {
         toast.error("Something Went Wrong")
