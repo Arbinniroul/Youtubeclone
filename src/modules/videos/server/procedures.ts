@@ -8,6 +8,89 @@ import { UTApi } from "uploadthing/server";
 import { z } from "zod";
 
 export const VideosRouter = createTRPCRouter({
+  getManySubscribed: protectedProcedure
+  .input(
+    z.object({
+      cursor: z.object({
+        id: z.string().uuid(),
+        updatedAt: z.date(),
+      }).nullish(),
+      limit: z.number().int().min(1).max(100),
+    }),
+  )
+  .query(async ({ input,ctx }) => {
+    const { cursor, limit } = input;
+   const {id:userId}=ctx.user;
+   const viewerSubscriptions=db.$with("subscription").as(
+    db.
+    select({userId:subscriptions.creatorId})
+    .from(subscriptions)
+    .where(eq(subscriptions.viewerId,userId))
+   )
+   
+
+    try {
+      const data = await db
+        .select({
+          ...getTableColumns(videos),
+          user: users,
+          viewCount: db.$count(videoViews, eq(videoViews.videoId, videos.id)),
+          likeCount: db.$count(
+            videoReactions,
+            and(
+              eq(videoReactions.videoId, videos.id),
+              eq(videoReactions.type, "like")
+            )
+          ),
+          dislikeCount: db.$count(
+            videoReactions,
+            and(
+              eq(videoReactions.videoId, videos.id),
+              eq(videoReactions.type, "dislike")
+            )
+          )
+        })
+        .from(videos)
+        .innerJoin(users, eq(videos.userId, users.id))
+        .innerJoin(viewerSubscriptions,eq(viewerSubscriptions.userId,users.id))
+        .where(
+          and(
+            eq(videos.visibility, "public"),
+            cursor
+              ? or(
+                  lt(videos.updatedAt, cursor?.updatedAt ?? new Date()),
+                  and(
+                    eq(videos.updatedAt, cursor.updatedAt),
+                    lt(videos.id, cursor.id),
+                  ),
+                )
+              : undefined,
+          ),
+        )
+        .orderBy(desc(videos.updatedAt), desc(videos.id))
+        .limit(limit + 1);
+
+  
+          const hasMore = data.length > limit;
+          const items = hasMore ? data.slice(0, -1) : data;
+          const lastItem = items[items.length - 1];
+  
+          const nextCursor = hasMore
+            ? { id: lastItem.id, updatedAt: lastItem.updatedAt }
+            : null;
+  
+          return {
+            items,
+            nextCursor,
+          };
+        } catch (error) {
+          console.error("Error fetching videos:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to fetch videos",
+          });
+        }
+      }),
   getTrending: baseProcedure
   .input(
     z.object({

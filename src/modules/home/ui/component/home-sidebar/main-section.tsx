@@ -14,7 +14,7 @@ const items = [
   },
   {
     title: "Subscription",
-    url: "/feed/subscription",
+    url: "/feed/subscribed",
     icon: PlaySquareIcon, // Use the imported icon component
     auth: true,
   },
